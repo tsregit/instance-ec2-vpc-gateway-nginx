@@ -1,5 +1,5 @@
 resource "aws_security_group" "external" {
-  name = "${var.project_name}-external-sg"
+  name = "${local.name_prefix}-SG"
   vpc_id = aws_vpc.vpc.id
   ingress {
     from_port = 80
@@ -19,4 +19,12 @@ resource "aws_security_group" "external" {
     to_port = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+  lifecycle {
+      create_before_destroy = true
+  }
+  tags = merge({
+    Name = "${local.name_prefix}-SG"
+  },
+  local.default_tags,
+  )
 }

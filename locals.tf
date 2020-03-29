@@ -1,7 +1,7 @@
 locals {
   name_prefix = var.environment
   default_tags = {
-      Enviroment = var.env
+      Enviroment = var.environment
       Product    = var.product
   }
   asg_default_tags =[

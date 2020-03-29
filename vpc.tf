@@ -1,13 +1,13 @@
-data "aws_availability_zones" "az" {}
-
 //cidr_block Nos permite crear bloques de SUBNET
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = {
-    Name = "pets"
-  }
+  tags = merge({
+    Name = "${local.name_prefix}-VPC"
+  },
+  local.default_tags,
+  )
 }
 
 resource "aws_subnet" "public" {
@@ -15,9 +15,11 @@ resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.vpc.id
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.az.names[0]
-  tags = {
-    Name = "${var.cidr_public}-${var.aws_region}-Public"
-  }
+  tags = merge({
+    Name = "${local.name_prefix}-${var.cidr_public}-${var.aws_region}-PUBLIC"
+  },
+  local.default_tags,
+  )
 }
 
 resource "aws_subnet" "private" {
@@ -25,16 +27,20 @@ resource "aws_subnet" "private" {
   vpc_id                  = aws_vpc.vpc.id
   map_public_ip_on_launch = true
   availability_zone       = data.aws_availability_zones.az.names[0]
-  tags = {
-    Name = "${var.cidr_private}-${var.aws_region}-Private"
-  }
+  tags = merge({
+    Name = "${local.name_prefix}-${var.cidr_public}-${var.aws_region}-PRIVATE"
+  },
+  local.default_tags,
+  )
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
-  tags = {
-    Name = "IGW${var.project_name}Public"
-  } 
+  tags = merge({
+    Name = "${local.name_prefix}-PUBLIC-IGW"
+  },
+  local.default_tags,
+  ) 
 }
 
 resource "aws_route" "default_route" {
